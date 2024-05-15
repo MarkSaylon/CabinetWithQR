@@ -27,7 +27,7 @@ class CabinetDao(private val context: Context) {
         db.close()
         dbHelper.close()
     }
-
+    //pabayaan niyo na errors here hehe di ko gets bat ayaw nila mawala pero it works fine.
     fun getAllLogs(): List<CabinetLog> {
         val logList = mutableListOf<CabinetLog>()
         val db = dbHelper.readableDatabase
