@@ -10,118 +10,96 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentHomeBinding
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val cabinetLogDao by lazy { CabinetDao(requireContext()) }
-
     private val binding get() = _binding!!
 
+    private val cabinetLogDao by lazy { CabinetDao(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            val cabinet1State = cabinetLogDao.getLatestStateForCabinet("Cabinet1")
+            val cabinet2State = cabinetLogDao.getLatestStateForCabinet("Cabinet2")
+            val cabinet3State = cabinetLogDao.getLatestStateForCabinet("Cabinet3")
+
+            updateCabinetUI(binding.takeButton, binding.textView1, cabinet1State)
+            updateCabinetUI(binding.takeButton2, binding.textView2, cabinet2State)
+            updateCabinetUI(binding.takeButton3, binding.textView3, cabinet3State)
+        }
+
         binding.takeButton.setOnClickListener {
-            var openclose = 0
-            val time = getCurrentTime()
-            var state = "In Use"
-            var cabinetName = "Cabinet1"
-            var notif = "Cabinet 1 is now in use"
-            if(openclose == 1){
-                state = "Available"
-                cabinetName = "Cabinet1"
-                notif = "Cabinet 1 is now empty"
-                binding.takeButton.text = "Use"
-                binding.textView1.text = "In Use"
-                openclose = 0
-            }else{
-                binding.takeButton.text = "Claim"
-                binding.textView1.text = "Available"
-                openclose = 1
-            }
-
-            cabinetLogDao.insert(time, state, cabinetName, notif)
-
-            // Show the notification
-            showNotification("Cabinet 1", openclose)
+            toggleCabinetState("Cabinet1")
+            val cabinet1State = cabinetLogDao.getLatestStateForCabinet("Cabinet1")
+            updateCabinetUI(binding.takeButton, binding.textView1,cabinet1State)
         }
 
         binding.takeButton2.setOnClickListener {
-            var openclose = 0
-            val time = getCurrentTime()
-            var state = "In Use"
-            var cabinetName = "Cabinet2"
-            var notif = "Cabinet 2 is now in use"
-            if(openclose == 1){
-                state = "Available"
-                cabinetName = "Cabinet2"
-                notif = "Cabinet 2 is now empty"
-                binding.takeButton2.text = "Use"
-                binding.textView2.text = "In Use"
-                openclose = 0
-            }else{
-                binding.takeButton2.text = "Claim"
-                binding.textView2.text = "Available"
-                openclose = 1
-            }
-
-            cabinetLogDao.insert(time, state, cabinetName, notif)
-
-            // Show the notification
-            showNotification("Cabinet 2", openclose)
+            toggleCabinetState("Cabinet2")
+            val cabinet2State = cabinetLogDao.getLatestStateForCabinet("Cabinet2")
+            updateCabinetUI(binding.takeButton2, binding.textView2,cabinet2State)
         }
 
         binding.takeButton3.setOnClickListener {
-            var openclose = 0
+            toggleCabinetState("Cabinet3")
+            val cabinet2State = cabinetLogDao.getLatestStateForCabinet("Cabinet3")
+            updateCabinetUI(binding.takeButton3, binding.textView3,cabinet2State)
+        }
+
+        return root
+    }
+
+    private fun updateCabinetUI(button: Button, textView: TextView, state: String?) {
+        if (state == "In Use") {
+            button.text = "Use"
+            textView.text = "Available"
+        } else {
+            button.text = "Claim"
+            textView.text = "In Use"
+        }
+    }
+
+    private fun toggleCabinetState(cabinetName: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
             val time = getCurrentTime()
-            var state = "In Use"
-            var cabinetName = "Cabinet3"
-            var notif = "Cabinet 3 is now in use"
-            if(openclose == 1){
-                state = "Available"
-                cabinetName = "Cabinet3"
-                notif = "Cabinet 3 is now empty"
-                binding.takeButton3.text = "Use"
-                binding.textView3.text = "In Use"
-                openclose = 0
-            }else{
-                binding.takeButton3.text = "Claim"
-                binding.textView3.text = "Available"
-                openclose = 1
+            val state = if (cabinetLogDao.getLatestStateForCabinet(cabinetName) == "In Use") {
+                "Available"
+            } else {
+                "In Use"
+            }
+            val notif = if (state == "In Use") {
+                "$cabinetName is now in use"
+            } else {
+                "$cabinetName is now empty"
             }
 
             cabinetLogDao.insert(time, state, cabinetName, notif)
-
-            // Show the notification
-            showNotification("Cabinet 3", openclose)
+            showNotification(cabinetName, state)
         }
-        return root
     }
-    private fun showNotification(cabinet: String, openclose:Int) {
+
+    private fun showNotification(cabinet: String, state: String) {
         val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        var contentText: String? = null
+        var contentText: String
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
@@ -130,12 +108,11 @@ class HomeFragment : Fragment() {
         val notificationId = 1
         val channelId = "cabinet_channel_id"
         val contentTitle = "Cabinet Status"
-        if (openclose == 0){
-            contentText = "$cabinet is now in use"
+        contentText = if (state == "In Use") {
+            "$cabinet is now in use"
         } else {
-            contentText = "$cabinet is now available"
+            "$cabinet is now available"
         }
-
 
         val builder = NotificationCompat.Builder(requireContext(), channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)

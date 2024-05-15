@@ -49,7 +49,22 @@ class CabinetDao(private val context: Context) {
         return logList
     }
 
-    // Add methods for updating and deleting data if needed
+    fun getLatestStateForCabinet(cabinetName: String): String? {
+        val db = dbHelper.readableDatabase
+        val query = "SELECT ${ DBHelper.COLUMN_STATE } FROM ${ DBHelper.TABLE_NAME } WHERE ${ DBHelper.COLUMN_CABINET_NAME } = ? ORDER BY ${ DBHelper.COLUMN_ID } DESC LIMIT 1"
+        val cursor: Cursor = db.rawQuery(query, arrayOf(cabinetName))
+        var latestState: String? = null
+
+        if (cursor.moveToFirst()) {
+            latestState = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_STATE))
+        }
+
+        cursor.close()
+        db.close()
+        return latestState
+    }
+
+    // Di niyo naman ata need ng delete so okay na to.
 }
 
 data class CabinetLog(
