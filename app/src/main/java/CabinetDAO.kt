@@ -6,7 +6,7 @@ import android.util.Log
 class CabinetDao(private val context: Context) {
     private val dbHelper = DBHelper(context)
 
-    fun insert(time: String, state: String, cabinetName: String, notif:String) {
+    fun insert(time: String, state: String, cabinetName: String, notif:String, imageLink: String?) {
         val dbHelper = DBHelper(context)
         val db = dbHelper.writableDatabase
 
@@ -15,6 +15,9 @@ class CabinetDao(private val context: Context) {
             put(DBHelper.COLUMN_STATE, state)
             put(DBHelper.COLUMN_CABINET_NAME, cabinetName)
             put(DBHelper.COLUMN_NOTIF, notif)
+            if (imageLink != null) {
+                put(DBHelper.COLUMN_IMAGE_LINK, imageLink)
+            }
         }
 
         val result = db.insert(DBHelper.TABLE_NAME, null, values)
@@ -27,19 +30,27 @@ class CabinetDao(private val context: Context) {
         db.close()
         dbHelper.close()
     }
-    //pabayaan niyo na errors here hehe di ko gets bat ayaw nila mawala pero it works fine.
+    //pabayaan niyo na errors here hehe di ko gets bat ayaw nila mawala pero it works fine. edit: natanggal ko na, kailangan lang pala ng checker
     fun getAllLogs(): List<CabinetLog> {
         val logList = mutableListOf<CabinetLog>()
         val db = dbHelper.readableDatabase
         val cursor: Cursor = db.rawQuery("SELECT * FROM ${DBHelper.TABLE_NAME}", null)
         if (cursor.moveToFirst()) {
             do {
+                val idIndex = cursor.getColumnIndex(DBHelper.COLUMN_ID)
+                val timeIndex = cursor.getColumnIndex(DBHelper.COLUMN_TIME)
+                val stateIndex = cursor.getColumnIndex(DBHelper.COLUMN_STATE)
+                val cabinetNameIndex = cursor.getColumnIndex(DBHelper.COLUMN_CABINET_NAME)
+                val notifIndex = cursor.getColumnIndex(DBHelper.COLUMN_NOTIF)
+                val imageLinkIndex = cursor.getColumnIndex(DBHelper.COLUMN_IMAGE_LINK)
+
                 val log = CabinetLog(
-                    cursor.getInt(cursor.getColumnIndex(DBHelper.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_TIME)),
-                    cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_STATE)),
-                    cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_CABINET_NAME)),
-                    cursor.getString((cursor.getColumnIndex((DBHelper.COLUMN_NOTIF))))
+                    if (idIndex != -1) cursor.getInt(idIndex) else -1,
+                    if (timeIndex != -1) cursor.getString(timeIndex) else "",
+                    if (stateIndex != -1) cursor.getString(stateIndex) else "",
+                    if (cabinetNameIndex != -1) cursor.getString(cabinetNameIndex) else "",
+                    if (notifIndex != -1) cursor.getString(notifIndex) else "",
+                    if (imageLinkIndex != -1) cursor.getString(imageLinkIndex) else null
                 )
                 logList.add(log)
             } while (cursor.moveToNext())
@@ -48,7 +59,7 @@ class CabinetDao(private val context: Context) {
         db.close()
         return logList
     }
-
+    //dito sa retrieval di ko na gets ung error, naandar naman and I have yet to see what problems this might bring so ehhhh
     fun getLatestStateForCabinet(cabinetName: String): String? {
         val db = dbHelper.readableDatabase
         val query = "SELECT ${ DBHelper.COLUMN_STATE } FROM ${ DBHelper.TABLE_NAME } WHERE ${ DBHelper.COLUMN_CABINET_NAME } = ? ORDER BY ${ DBHelper.COLUMN_ID } DESC LIMIT 1"
@@ -56,7 +67,16 @@ class CabinetDao(private val context: Context) {
         var latestState: String? = null
 
         if (cursor.moveToFirst()) {
-            latestState = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_STATE))
+            // Check if the column index is valid (not -1)
+            val columnIndex = cursor.getColumnIndex(DBHelper.COLUMN_STATE)
+            if (columnIndex != -1) {
+                latestState = cursor.getString(columnIndex)
+            } else {
+                // Throw an exception if column index is -1
+                cursor.close()
+                db.close()
+                throw IllegalStateException("Column ${DBHelper.COLUMN_STATE} does not exist")
+            }
         }
 
         cursor.close()
@@ -72,5 +92,6 @@ data class CabinetLog(
     val time: String,
     val state: String,
     val cabinetName: String,
-    val notif :String
+    val notif :String,
+    val imageLink: String?
 )
