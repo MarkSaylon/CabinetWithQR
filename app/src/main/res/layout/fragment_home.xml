@@ -7,16 +7,17 @@
     tools:context=".ui.home.HomeFragment">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/Cabinet1"
         android:layout_width="350dp"
         android:layout_height="150dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:elevation="1000mm"
+        android:outlineSpotShadowColor="@color/black"
+        app:cardBackgroundColor="@color/colorAccent_dark"
+        app:cardCornerRadius="6dp"
+        app:layout_constraintBottom_toTopOf="@id/Cabinet2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.05"
-        app:cardBackgroundColor="@color/teal_700"
-        android:id="@+id/Cabinet1"
-        app:cardCornerRadius="6dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -25,15 +26,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed-medium"
                 android:text="Cabinet 1"
                 android:textColor="@color/black"
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.083"
+                app:layout_constraintHorizontal_bias="0.502"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.164" />
+                app:layout_constraintVertical_bias="0.145" />
 
             <TextView
                 android:id="@+id/textView1"
@@ -41,50 +43,56 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/black"
                 android:text="Available"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.761"
+                app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.244" />
+                app:layout_constraintVertical_bias="0.427" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="100dp"
                 android:layout_height="50dp"
+                android:background="@drawable/shadowboiii"
                 android:text="Camera"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.396"
+                app:layout_constraintHorizontal_bias="0.184"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.85" />
+                app:layout_constraintVertical_bias="0.86" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/takeButton"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
+                android:background="@drawable/shadowboiii"
                 android:text="Take"
-                android:id="@+id/takeButton"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.848"
+                app:layout_constraintHorizontal_bias="0.812"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.84" />
+                app:layout_constraintVertical_bias="0.86" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/Cabinet2"
         android:layout_width="350dp"
         android:layout_height="150dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="@color/colorAccent_dark"
+        app:cardCornerRadius="6dp"
+        app:layout_constraintBottom_toTopOf="@id/Cabinet3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.35"
-        app:cardBackgroundColor="@color/teal_700"
-        android:id="@+id/Cabinet2"
-        app:cardCornerRadius="6dp">
+        app:layout_constraintTop_toBottomOf="@id/Cabinet1"
+        android:elevation="1000mm"
+        android:outlineSpotShadowColor="@color/black">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -98,61 +106,68 @@
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.083"
+                app:layout_constraintHorizontal_bias="0.502"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.164" />
+                app:layout_constraintVertical_bias="0.145"
+                android:fontFamily="sans-serif-condensed-medium"/>
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 android:text="Available"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.761"
+                app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.244" />
+                app:layout_constraintVertical_bias="0.427" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:text="Camera"
+                android:background="@drawable/shadowboiii"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.396"
+                app:layout_constraintHorizontal_bias="0.184"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.85" />
+                app:layout_constraintVertical_bias="0.86" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/takeButton2"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:text="Take"
-                android:id="@+id/takeButton2"
+                android:background="@drawable/shadowboiii"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.848"
+                app:layout_constraintHorizontal_bias="0.812"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.84" />
+                app:layout_constraintVertical_bias="0.86" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/Cabinet3"
         android:layout_width="350dp"
         android:layout_height="150dp"
+        android:elevation="1000mm"
+        android:outlineSpotShadowColor="@color/black"
+        app:cardBackgroundColor="@color/colorAccent_dark"
+        app:cardCornerRadius="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.65"
-        app:cardBackgroundColor="@color/teal_700"
-        android:id="@+id/Cabinet3"
-        app:cardCornerRadius="6dp">
+        app:layout_constraintTop_toBottomOf="@id/Cabinet2">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -161,15 +176,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed-medium"
                 android:text="Cabinet 3"
                 android:textColor="@color/black"
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.083"
+                app:layout_constraintHorizontal_bias="0.502"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.164" />
+                app:layout_constraintVertical_bias="0.145" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -177,35 +193,40 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/black"
                 android:text="Available"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.761"
+                app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.244" />
+                app:layout_constraintVertical_bias="0.427" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="100dp"
                 android:layout_height="50dp"
+                android:background="@drawable/shadowboiii"
                 android:text="Camera"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.396"
+                app:layout_constraintHorizontal_bias="0.184"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.85" />
+                app:layout_constraintVertical_bias="0.86" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/takeButton3"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
+                android:background="@drawable/shadowboiii"
                 android:text="Take"
-                android:id="@+id/takeButton3"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.848"
+                app:layout_constraintHorizontal_bias="0.812"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.84" />
+                app:layout_constraintVertical_bias="0.86" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

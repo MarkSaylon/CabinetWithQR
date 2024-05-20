@@ -67,7 +67,16 @@ class CabinetDao(private val context: Context) {
         var latestState: String? = null
 
         if (cursor.moveToFirst()) {
-            latestState = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_STATE))
+            // Check if the column index is valid (not -1)
+            val columnIndex = cursor.getColumnIndex(DBHelper.COLUMN_STATE)
+            if (columnIndex != -1) {
+                latestState = cursor.getString(columnIndex)
+            } else {
+                // Throw an exception if column index is -1
+                cursor.close()
+                db.close()
+                throw IllegalStateException("Column ${DBHelper.COLUMN_STATE} does not exist")
+            }
         }
 
         cursor.close()

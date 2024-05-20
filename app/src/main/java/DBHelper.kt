@@ -17,7 +17,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_TIME TEXT, $COLUMN_STATE TEXT, $COLUMN_CABINET_NAME TEXT, $COLUMN_NOTIF, $COLUMN_IMAGE_LINK)"
+        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_TIME TEXT, $COLUMN_STATE TEXT, $COLUMN_CABINET_NAME TEXT, $COLUMN_NOTIF TEXT, $COLUMN_IMAGE_LINK TEXT)"
         db.execSQL(createTableQuery)
         Log.d("DBHelper", "Table created: $TABLE_NAME")
     }

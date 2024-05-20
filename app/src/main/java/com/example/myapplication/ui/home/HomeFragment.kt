@@ -7,8 +7,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,19 +16,26 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentHomeBinding
 import kotlinx.coroutines.Dispatchers
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class HomeFragment : Fragment() {
 
@@ -44,6 +49,8 @@ class HomeFragment : Fragment() {
     private var isImageReceived = false
     private var qrCodeDialog: Dialog? = null
 
+    private val client = OkHttpClient()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,7 +59,7 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        viewLifecycleOwner.lifecycleScope.launch {
+
             val cabinet1State = cabinetLogDao.getLatestStateForCabinet("Cabinet1")
             val cabinet2State = cabinetLogDao.getLatestStateForCabinet("Cabinet2")
             val cabinet3State = cabinetLogDao.getLatestStateForCabinet("Cabinet3")
@@ -60,7 +67,8 @@ class HomeFragment : Fragment() {
             updateCabinetUI(binding.takeButton, binding.textView1, cabinet1State)
             updateCabinetUI(binding.takeButton2, binding.textView2, cabinet2State)
             updateCabinetUI(binding.takeButton3, binding.textView3, cabinet3State)
-        }
+            Log.e("Loglang","Ito yung paulit ulit LCSL")
+
 
         binding.takeButton.setOnClickListener {
             showQRCodePopup("Cabinet1")
@@ -79,34 +87,37 @@ class HomeFragment : Fragment() {
 
     private fun updateCabinetUI(button: Button, textView: TextView, state: String?) {
         if (state == "In Use") {
-            button.text = "Use"
-            textView.text = "Available"
-        } else {
             button.text = "Claim"
             textView.text = "In Use"
+        } else {
+            button.text = "Use"
+            textView.text = "Available"
+            Log.e("Mali","Bat ako andito"+state)
         }
     }
 
     private fun showQRCodePopup(cabinetName: String) {
+        Log.d("HomeFragment", "showQRCodePopup: $cabinetName")
+
         val qrCodes = when (cabinetName) {
             "Cabinet1" -> listOf(
                 R.drawable.drawer_a_1,
                 R.drawable.drawer_a_2,
                 R.drawable.drawer_a_3,
                 R.drawable.drawer_a_4
-            )
+            ).shuffled()
             "Cabinet2" -> listOf(
                 R.drawable.drawer_b_1,
                 R.drawable.drawer_b_2,
                 R.drawable.drawer_b_3,
                 R.drawable.drawer_b_4
-            )
+            ).shuffled()
             "Cabinet3" -> listOf(
                 R.drawable.drawer_c_1,
                 R.drawable.drawer_c_2,
                 R.drawable.drawer_c_3,
                 R.drawable.drawer_c_4
-            )
+            ).shuffled()
             else -> emptyList()
         }
 
@@ -116,8 +127,6 @@ class HomeFragment : Fragment() {
         if (qrCodeDialog == null) {
             qrCodeDialog = Dialog(requireContext())
             qrCodeDialog?.setContentView(R.layout.dialog_qr_code)
-
-            val qrCodeImageView = qrCodeDialog?.findViewById<ImageView>(R.id.qrCodeImageView)
 
             qrCodeDialog?.setOnDismissListener {
                 currentQRCodeIndex = -1
@@ -138,24 +147,45 @@ class HomeFragment : Fragment() {
         currentQRCodeIndex++
 
         // Wait for the image to be received
-        waitForImageReceived(qrCodeDialog!!, cabinetName)
-    }
-
-    private fun waitForImageReceived(qrCodeDialog: Dialog, cabinetName: String) {
-        val waitHandler = Handler(Looper.getMainLooper())
-        val waitRunnable = object : Runnable {
-            override fun run() {
-                if (isImageReceived) {
-                    // pag nareceive yung image saka sya gagalaw
-                    toggleCabinetState(cabinetName)
-                    qrCodeDialog.dismiss()
-                } else {
-                    waitHandler.postDelayed(this, 1000) // wait lang to para di sya mawala agad.
-                }
+        lifecycleScope.launch {
+            waitForImageReceived(cabinetName)
+            if (isImageReceived) {
+                toggleCabinetState(cabinetName)
+                qrCodeDialog?.dismiss()
             }
         }
+    }
 
-        waitHandler.post(waitRunnable)
+    private suspend fun waitForImageReceived(cabinetName: String) {
+        while (!isImageReceived) {
+            checkIfQRCodeScanned(cabinetName)
+            delay(1000)
+        }
+    }
+
+    private fun checkIfQRCodeScanned(cabinetName: String) {
+        val request = Request.Builder()
+            .url("http://192.168.1.6:5000")
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("HomeFragment", "Error checking QR code status: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val jsonResponse = JSONObject(response.body?.string() ?: "{}")
+                isImageReceived = jsonResponse.getBoolean("scanned")
+                response.close()
+
+                if (isImageReceived) {
+                    lifecycleScope.launch {
+
+                        qrCodeDialog?.dismiss()
+                    }
+                }
+            }
+        })
     }
 
     private suspend fun downloadImage(imageUrl: String): ByteArray {
@@ -194,29 +224,45 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun downloadAndSaveImage(): String? {
-        val imageUrl = "link nung potragis na rpi"
+        val imageUrl = "http://192.168.1.6:5000/image"
         val imageFile = saveImageToFile(imageUrl)
         return imageFile?.absolutePath
     }
 
-    private fun toggleCabinetState(cabinetName: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            showQRCodePopup(cabinetName)
-            val imageLink = downloadAndSaveImage()
-            val time = getCurrentTime()
-            val state = if (cabinetLogDao.getLatestStateForCabinet(cabinetName) == "In Use") {
-                "Available"
-            } else {
-                "In Use"
-            }
-            val notif = if (state == "In Use") {
-                "$cabinetName is now in use"
-            } else {
-                "$cabinetName is now empty"
-            }
+    private suspend fun toggleCabinetState(cabinetName: String) {
+        val imageLink = downloadAndSaveImage()
+        val time = getCurrentTime()
+        val state = if (cabinetLogDao.getLatestStateForCabinet(cabinetName) == "In Use") {
+            "Available"
+        } else {
+            "In Use"
+        }
+        val notif = if (state == "In Use") {
+            "$cabinetName is now in use"
+        } else {
+            "$cabinetName is now available"
+        }
 
-            cabinetLogDao.insert(time, state, cabinetName, notif, imageLink)
-            showNotification(cabinetName, state)
+        cabinetLogDao.insert(time, state, cabinetName, notif, imageLink)
+        showNotification(cabinetName, state)
+
+        // Switch case to para dun sa UI
+        when (cabinetName) {
+            "Cabinet1" -> updateCabinetUI(binding.takeButton, binding.textView1, state)
+            "Cabinet2" -> updateCabinetUI(binding.takeButton2, binding.textView2, state)
+            "Cabinet3" -> updateCabinetUI(binding.takeButton3, binding.textView3, state)
+        }
+    }
+
+    private fun updateUIAfterDatabaseUpdate() {
+        lifecycleScope.launch {
+            val cabinet1State = cabinetLogDao.getLatestStateForCabinet("Cabinet1")
+            val cabinet2State = cabinetLogDao.getLatestStateForCabinet("Cabinet2")
+            val cabinet3State = cabinetLogDao.getLatestStateForCabinet("Cabinet3")
+
+            updateCabinetUI(binding.takeButton, binding.textView1, cabinet1State)
+            updateCabinetUI(binding.takeButton2, binding.textView2, cabinet2State)
+            updateCabinetUI(binding.takeButton3, binding.textView3, cabinet3State)
         }
     }
 
@@ -237,28 +283,22 @@ class HomeFragment : Fragment() {
             "$cabinet is now available"
         }
 
-        val builder = NotificationCompat.Builder(requireContext(), channelId)
+        val notification = NotificationCompat.Builder(requireContext(), channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(contentTitle)
             .setContentText(contentText)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
 
-        notificationManager.notify(notificationId, builder.build())
+        notificationManager.notify(notificationId, notification)
     }
 
     private fun createNotificationChannel(notificationManager: NotificationManager) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "cabinet_channel_id"
-            val channelName = "Cabinet Notifications"
-            val channelDescription = "Notifications for cabinet status"
-            val channelImportance = NotificationManager.IMPORTANCE_DEFAULT
-
-            val channel = NotificationChannel(channelId, channelName, channelImportance).apply {
-                description = channelDescription
-            }
-
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channelId = "cabinet_channel_id"
+        val channelName = "Cabinet Notifications"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(channelId, channelName, importance)
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun getCurrentTime(): String {
