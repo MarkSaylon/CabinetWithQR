@@ -3,12 +3,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.NotifLogBinding
 
-class NotificationAdapter(private val logs: List<CabinetLog>) : RecyclerView.Adapter<NotificationAdapter.NotifHolder>() {
+class NotificationAdapter(private val logs: List<DoorLog>) : RecyclerView.Adapter<NotificationAdapter.NotifHolder>() {
 
     inner class NotifHolder(private val binding:NotifLogBinding):RecyclerView.ViewHolder(binding.root){
-        fun bind(log:CabinetLog){
+        fun bind(log:DoorLog){
             binding.tvTime.text = log.time
-            binding.tvNotif.text = log.notif
+            binding.tvNotif.text = log.doorState
         }
     }
 

@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed-medium"
-                android:text="Cabinet 1"
+                android:text="Drawer A"
                 android:textColor="@color/black"
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -56,6 +56,7 @@
                 android:layout_height="50dp"
                 android:background="@drawable/shadowboiii"
                 android:text="Camera"
+                android:id="@+id/showVideoFeedButton"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -101,7 +102,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cabinet 2"
+                android:text="Drawer B"
                 android:textColor="@color/black"
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -130,6 +131,7 @@
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:text="Camera"
+                android:id="@+id/showVideoFeedButton2"
                 android:background="@drawable/shadowboiii"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -164,7 +166,7 @@
         android:outlineSpotShadowColor="@color/black"
         app:cardBackgroundColor="@color/colorAccent_dark"
         app:cardCornerRadius="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/changeIp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/Cabinet2">
@@ -177,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed-medium"
-                android:text="Cabinet 3"
+                android:text="Drawer C"
                 android:textColor="@color/black"
                 android:textSize="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -205,6 +207,7 @@
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:background="@drawable/shadowboiii"
+                android:id="@+id/showVideoFeedButton3"
                 android:text="Camera"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -227,6 +230,51 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.86" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/changeIp"
+        android:layout_width="350dp"
+        android:layout_height="75dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Cabinet3"
+        app:cardBackgroundColor="@color/colorAccent_dark"
+        app:cardCornerRadius="6dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/changeAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Enter IP Address"
+                android:textColorHint="@color/black"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/pushIPChange"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/pushIPChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change IP"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.931"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.481"
+                android:background="@drawable/shadowboiii"
+                android:textColor="@color/colorPrimary"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

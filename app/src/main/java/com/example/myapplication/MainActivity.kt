@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
